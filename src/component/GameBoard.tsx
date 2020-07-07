@@ -1,6 +1,6 @@
 import React from 'react';
 import './GameBoard.css';
-import TargetInfo, { GenerateTarget } from '../modules/TargetInfo';
+import TargetInfo, { GenerateTargets } from '../modules/TargetInfo';
 
 interface Props {
     lines? : number,
@@ -9,6 +9,7 @@ interface Props {
 interface State {
     selectedCell : { col : number, row : number }[],
     targets : TargetInfo[],
+    max : number,
 }
 
 // 参考 http://photoshopvip.net/120672
@@ -21,16 +22,13 @@ class GameBoard extends React.PureComponent<Props, State> {
         this.state = {
             selectedCell : [],
             targets : [],
+            max : 24,
         }
     }
 
     componentDidMount = () => {
-        const hoge = GenerateTarget(3,8);
-        console.log("hoge");
-        console.log(hoge);
-
         this.setState({
-            targets : [hoge],
+            targets : [...GenerateTargets(8)],
         })
     }
 
@@ -68,7 +66,7 @@ class GameBoard extends React.PureComponent<Props, State> {
                 })
                 cells.push(
                     <button className={`cell ${selected? 'selected' : 'unselected'}`} key={`${i.toString()}_${j.toString()}`} onClick={()=>{this.onClickCell(i, j)}}>
-                        <p>{isTarget? '●' : '○'}</p>
+                        <p style={{margin : 'auto'}}>{isTarget? '●' : '○'}</p>
                     </button>
                 )
             }
@@ -82,7 +80,14 @@ class GameBoard extends React.PureComponent<Props, State> {
 
         return (
             <div>
-                {rows}
+                <div className="description">
+                    <p>下記の64マスの中に海賊船が隠れています。</p>
+                    <p>海賊船は3隻あり、船体の長さがそれぞれ違います。<br/>最も短い海賊船は3マス、長い海賊船は5マスです。</p>
+                    <p>マスをクリックして大砲で攻撃しましょう。<br/>大砲の弾は24発まで発射できます。</p>
+                </div>
+                <div>
+                    {rows}
+                </div>
             </div>
         );
     }
