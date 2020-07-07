@@ -5,6 +5,17 @@
     display: table;
 }
 
+.description {
+    margin: 0.5rem auto 1rem auto;
+    padding: 0.5rem;
+    width: 30%;
+    box-shadow: inset 3px 3px 7px rgba(136, 165, 191, 0.48), inset -3px -3px 7px #FFFFFF;
+}
+
+.description p {
+    color: #212529;
+}
+
 button, input {
     border: 0;
     outline: 0;
@@ -32,6 +43,7 @@ button, input {
     margin: 3px;
     font-size: 20px;
 }
+
 .unselected:hover {
     box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #BABECC;
 }

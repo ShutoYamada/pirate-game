@@ -2,12 +2,17 @@ body, html {
   background-color : #EBECF0;
 }
 
+div p {
+  color: #BABECC;
+  text-shadow: 1px 1px 1px #FFF;
+}
+
 .App {
   text-align: center;
 }
 
 .App-header {
-  min-height: 4rem;
+  min-height: 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
