@@ -44,7 +44,7 @@ export const GenerateTarget = (length : number, lines : number) : TargetInfo => 
                 }
                 break;
             // down
-            case 2:
+            case 2: 
                 if(row + length <= lines){
                     created = true;
                     for(let i = row; i < lines; i++){
