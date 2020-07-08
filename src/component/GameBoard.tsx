@@ -1,7 +1,7 @@
 import React from 'react';
 import './GameBoard.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShip, faTimes, faCertificate, faCrosshairs } from "@fortawesome/free-solid-svg-icons";
+import { faShip, faTimes, faCertificate, faCrosshairs, faWater } from "@fortawesome/free-solid-svg-icons";
 import TargetInfo, { GenerateTargets } from '../modules/TargetInfo';
 
 interface Props {
@@ -13,8 +13,6 @@ interface State {
     targets : TargetInfo[],
     max : number,
 }
-
-// 参考 http://photoshopvip.net/120672
 
 class GameBoard extends React.PureComponent<Props, State> {
 
@@ -32,6 +30,9 @@ class GameBoard extends React.PureComponent<Props, State> {
         this?.reset();
     }
 
+    /**
+     * ゲームリセット
+     */
     reset = () => {
         this.setState({
             targets : [...GenerateTargets(8)],
@@ -39,23 +40,54 @@ class GameBoard extends React.PureComponent<Props, State> {
         })
     }
 
+    /**
+     * セル押下時処理
+     * @param row 
+     * @param col 
+     */
     onClickCell = (row : number, col : number) => {
+        let targets = Array.from(this.state.targets);
+        const max = this.state.max;
         const selectedCell = Array.from(this.state.selectedCell);
-        const findIndex : number = selectedCell.findIndex((c) => c.row === row && c.col === col);
+        const aliveShips : number = targets.filter(t => !t.isBroken).length
+        const isFinished : boolean = selectedCell.length === max || aliveShips === 0;
 
+        if(isFinished) {
+            alert('もう一度遊ぶには「リセット」を押してね!!');
+            return
+        };
+
+        // 既に選択済のマスかチェック
+        const findIndex : number = selectedCell.findIndex((c) => c.row === row && c.col === col);
         if(findIndex < 0){
             selectedCell.push({row, col});
+        } else {
+            return;
         }
 
+        // 選択済のマスから大破したターゲットがいるか探索
+        targets.forEach((t) => {
+            if(t.isBroken) return;
+            const allHit : boolean = selectedCell.filter((c) => {
+                return !!(t.cells.find((tc) => tc.row === c.row && tc.col === c.col));
+            }).length === t.cells.length;
+            // 大破の場合はフラグを立てておく
+            t.isBroken = allHit;
+        })
+
         this.setState({
-            selectedCell
+            selectedCell,
+            targets
         })
     }
 
     render = () => {
 
-        let { lines } = this.props;
         const { selectedCell, targets, max } = this.state;
+        const aliveShips : number = targets.filter(t => !t.isBroken).length
+        const isFinished : boolean = selectedCell.length === max || aliveShips === 0;
+
+        let { lines } = this.props;
         lines = lines || 8;
 
         let rows : JSX.Element[] = [];
@@ -68,13 +100,28 @@ class GameBoard extends React.PureComponent<Props, State> {
                 const selected : boolean = selectedCell.some((c) => c.row === i && c.col === j);
                 const isTarget : boolean = targets.some((t) => {
                     return !!(t.cells.find((c) => c.row === i && c.col === j));
-                })
+                });
 
-                //<FontAwesomeIcon className='icon times' icon={faTimes} />
+                // デフォルトでは透明アイコンを表示
+                let icon : JSX.Element = (
+                    <FontAwesomeIcon className='water' icon={faWater} />
+                );
+
+                // もし選択されたマスなら
+                if(selected){
+                    // ターゲットの有無で表示するアイコンを変更
+                    icon = isTarget? (
+                        <FontAwesomeIcon className='icon certificate' icon={faCertificate} />
+                    ) : (
+                        <FontAwesomeIcon className='icon times' icon={faTimes} />
+                    )
+                }
 
                 cells.push(
-                    <button className={`cell ${selected? 'selected' : 'unselected'}`} key={`${i.toString()}_${j.toString()}`} onClick={()=>{this.onClickCell(i, j)}}>
-                        <p style={{margin : 'auto'}}>{isTarget? '●' : '○'}</p>
+                    <button className={`cell ${selected? 'selected' : 'unselected'} ${isFinished && isTarget? 'target' : ''}`} 
+                            key={`${i.toString()}_${j.toString()}`} 
+                            onClick={()=>{this.onClickCell(i, j)}}>
+                        {icon}
                     </button>
                 )
             }
@@ -86,17 +133,36 @@ class GameBoard extends React.PureComponent<Props, State> {
             )
         }
 
+        const result : JSX.Element = isFinished? (
+            <div className="status inset">
+                    {targets.filter(t => !t.isBroken).length === 0? (
+                        <p className='result'>完全勝利！</p>
+                    ) : (
+                        <p className='result'>残念！また遊んでね</p>
+                    )}
+            </div>
+        ) : null;
+
         return (
             <div>
                 <div className="description inset">
-                    <p>下記の64マスの中に海賊船が隠れています。</p>
-                    <p>海賊船は3隻あり、船体の長さがそれぞれ違います。<br/>最も短い海賊船は3マス、長い海賊船は5マスです。</p>
-                    <p>マスをクリックして大砲で攻撃しましょう。<br/>大砲の弾は24発まで発射できます。</p>
+                    <p>下記のマスの中に隠れている海賊船を大砲で撃沈しよう！<br/>
+                    海賊船は3隻で、船体の長さはそれぞれ3マス、4マス、5マス。<br/>
+                    大砲の弾は最大24発まで発射できます。</p>
                 </div>
+                {result}
                 <div className="status inset"> 
                     <div>
+                        <FontAwesomeIcon className='icon certificate' icon={faCertificate} />
+                        <p>当たり</p>
+                    </div>
+                    <div>
+                        <FontAwesomeIcon className='icon times' icon={faTimes} />
+                        <p>外れ</p>
+                    </div>
+                    <div>
                         <FontAwesomeIcon className='icon ship' icon={faShip} />
-                        <p>3/3</p>
+                        <p>{`${targets.filter(t => !t.isBroken).length}/${targets.length}`}</p>
                     </div>
                     <div>
                         <FontAwesomeIcon className='icon crosshairs' icon={faCrosshairs} />
@@ -107,7 +173,7 @@ class GameBoard extends React.PureComponent<Props, State> {
                     {rows}
                 </div>
                 <div className="menu">
-                    <button className="neumorphic-btn" onClick={this?.reset} >やり直す</button>
+                    <button className="neumorphic-btn" onClick={this?.reset} >リセット</button>
                 </div>
             </div>
         );

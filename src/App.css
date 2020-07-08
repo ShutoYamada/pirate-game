@@ -12,11 +12,11 @@ div p {
 }
 
 .App-header {
-  min-height: 2.5rem;
+  min-height: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(22px + 2vmin);
+  font-size: calc(2rem);
   font-weight: bold;
 }

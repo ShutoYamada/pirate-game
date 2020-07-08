@@ -30,7 +30,7 @@
 }
 
 .status div {
-    margin: auto 1rem auto 1rem;
+    margin: auto 0.5rem auto 0.5rem;
     flex-direction: row;
     display: inline-block;
 }
@@ -61,6 +61,7 @@ button, input {
 .neumorphic-btn {
     font-size: 20px;
     border: none;
+    cursor: pointer;
     padding: 10px 40px;
     border-radius: 40px;
     color: #6D7587;
@@ -97,8 +98,12 @@ button, input {
     display:inline-flex;
     justify-content: center;
     align-items:center;
-    margin: 3px;
+    margin: 5px;
     font-size: 20px;
+}
+
+.target {
+    background-color: #E32400;
 }
 
 .unselected:hover {
@@ -114,7 +119,7 @@ button, input {
 }
 
 .icon {
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .ship {
@@ -131,4 +136,13 @@ button, input {
 
 .crosshairs {
     color: #E32400;
+}
+
+.water {
+    color: transparent;
+}
+
+.result {
+    font-size: 18px;
+    color: #E32400
 }

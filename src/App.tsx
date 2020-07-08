@@ -7,7 +7,7 @@ const App : React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <p className="title">Pirate Game</p>
+        <p className="title">海戦ゲーム</p>
       </header>
       <GameBoard />
     </div>
