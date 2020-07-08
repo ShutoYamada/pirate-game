@@ -6,6 +6,8 @@ export default class TargetInfo {
     cells : { row : number, col : number }[] = [];
     // 向き(0:up, 1:right, 2:down, 3:left)
     direction : number = -1;
+    // 沈没フラグ
+    isBroken : boolean = false;
 }
 
 /**

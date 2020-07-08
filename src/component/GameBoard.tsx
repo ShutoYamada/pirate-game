@@ -1,5 +1,7 @@
 import React from 'react';
 import './GameBoard.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShip, faTimes, faCertificate, faCrosshairs } from "@fortawesome/free-solid-svg-icons";
 import TargetInfo, { GenerateTargets } from '../modules/TargetInfo';
 
 interface Props {
@@ -27,18 +29,21 @@ class GameBoard extends React.PureComponent<Props, State> {
     }
 
     componentDidMount = () => {
+        this?.reset();
+    }
+
+    reset = () => {
         this.setState({
             targets : [...GenerateTargets(8)],
+            selectedCell : [],
         })
     }
 
     onClickCell = (row : number, col : number) => {
         const selectedCell = Array.from(this.state.selectedCell);
         const findIndex : number = selectedCell.findIndex((c) => c.row === row && c.col === col);
-        if(findIndex >= 0){
-            selectedCell.splice(findIndex, 1);
-        }
-        else {
+
+        if(findIndex < 0){
             selectedCell.push({row, col});
         }
 
@@ -50,7 +55,7 @@ class GameBoard extends React.PureComponent<Props, State> {
     render = () => {
 
         let { lines } = this.props;
-        const { selectedCell, targets } = this.state;
+        const { selectedCell, targets, max } = this.state;
         lines = lines || 8;
 
         let rows : JSX.Element[] = [];
@@ -64,6 +69,9 @@ class GameBoard extends React.PureComponent<Props, State> {
                 const isTarget : boolean = targets.some((t) => {
                     return !!(t.cells.find((c) => c.row === i && c.col === j));
                 })
+
+                //<FontAwesomeIcon className='icon times' icon={faTimes} />
+
                 cells.push(
                     <button className={`cell ${selected? 'selected' : 'unselected'}`} key={`${i.toString()}_${j.toString()}`} onClick={()=>{this.onClickCell(i, j)}}>
                         <p style={{margin : 'auto'}}>{isTarget? '●' : '○'}</p>
@@ -80,13 +88,26 @@ class GameBoard extends React.PureComponent<Props, State> {
 
         return (
             <div>
-                <div className="description">
+                <div className="description inset">
                     <p>下記の64マスの中に海賊船が隠れています。</p>
                     <p>海賊船は3隻あり、船体の長さがそれぞれ違います。<br/>最も短い海賊船は3マス、長い海賊船は5マスです。</p>
                     <p>マスをクリックして大砲で攻撃しましょう。<br/>大砲の弾は24発まで発射できます。</p>
                 </div>
+                <div className="status inset"> 
+                    <div>
+                        <FontAwesomeIcon className='icon ship' icon={faShip} />
+                        <p>3/3</p>
+                    </div>
+                    <div>
+                        <FontAwesomeIcon className='icon crosshairs' icon={faCrosshairs} />
+                        <p>{`${max - selectedCell.length}/${max}`}</p>
+                    </div>
+                </div>
                 <div>
                     {rows}
+                </div>
+                <div className="menu">
+                    <button className="neumorphic-btn" onClick={this?.reset} >やり直す</button>
                 </div>
             </div>
         );
