@@ -1,12 +1,22 @@
+/**
+ * ターゲットクラス
+ */
 export default class TargetInfo {
+    // 位置情報
     cells : { row : number, col : number }[] = [];
+    // 向き(0:up, 1:right, 2:down, 3:left)
     direction : number = -1;
 }
 
+/**
+ * 指定したマス目内に存在するTargetInfoを生成する
+ * @param lines 行数
+ */
 export const GenerateTargets = (lines : number) : TargetInfo[] => {
     if(lines < 0) return [];
     let result : TargetInfo[] = [];
 
+    // 長さが3,4,5のTargetInfoを生成する
     result.push(GenerateTarget(5,lines, result));
     result.push(GenerateTarget(4,lines, result));
     result.push(GenerateTarget(3,lines, result));
@@ -14,19 +24,25 @@ export const GenerateTargets = (lines : number) : TargetInfo[] => {
     return result;
 }
 
+/**
+ * TargetInfoを生成
+ * @param length 長さ
+ * @param lines 行数
+ * @param currentTargets 既に生成されているTargetInfoリスト
+ */
 export const GenerateTarget = (length : number, lines : number, currentTargets? : TargetInfo[]) : TargetInfo => {
     let result : TargetInfo = new TargetInfo();
     let created : boolean = false;
     currentTargets = currentTargets || [];
     
     while(!created){
+        // ランダムに座標と向きを生成する
         const row : number = Math.floor(Math.random()*(lines));
         const col : number = Math.floor(Math.random()*(lines));
-        // 0:up, 1:ri, 2:do, 3:le
         const direction : number = Math.floor(Math.random()*(4));
         result.direction = direction;
 
-        // 先に設定されたTargetInfo内の座標と被っているかチェック
+        // 先に設定されたTargetInfoの座標と被っているかチェック
         if(currentTargets.length > 0){
             let duplicate : boolean = false;
             switch(direction){
@@ -59,6 +75,7 @@ export const GenerateTarget = (length : number, lines : number, currentTargets? 
             if(duplicate) continue;
         }
 
+        // 生成された座標と向きがマス内に完全に収まるかチェック
         switch(direction){
             // up
             case 0:
